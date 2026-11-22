@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rainbow Connections</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fffaf3; --card:#ffffff; --ink:#24202b; --muted:#6d6577; --tile:#efe8dd; --tile-sel:#3b3446; --tile-sel-ink:#fff;
+  --l0:#f9d64a; --l1:#8fd16a; --l2:#7fb5f0; --l3:#c39bea; --l-ink:#1e1a24;
+  --rainbow:linear-gradient(90deg,#ff5f6d,#ffa24c,#ffd84d,#6ed47a,#4fb3ff,#8a7bff,#d77bff);
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16131c; --card:#211d29; --ink:#f3eef8; --muted:#a69eb2; --tile:#2e2938; --tile-sel:#f3eef8; --tile-sel-ink:#16131c;
+    --l0:#e8c43a; --l1:#79c057; --l2:#68a1e0; --l3:#b088dc;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#16131c; --card:#211d29; --ink:#f3eef8; --muted:#a69eb2; --tile:#2e2938; --tile-sel:#f3eef8; --tile-sel-ink:#16131c;
+  --l0:#e8c43a; --l1:#79c057; --l2:#68a1e0; --l3:#b088dc;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif}
+body{min-height:100vh;padding:0 16px 48px}
+.stripe{height:8px;background:var(--rainbow);margin:0 -16px}
+header{max-width:560px;margin:0 auto;padding:18px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+h1{font-family:Fraunces,Georgia,serif;font-weight:800;font-size:clamp(26px,7vw,36px);margin:0;line-height:1.05;
+   background:var(--rainbow);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--muted);font-size:14px;margin:2px 0 0}
+main{max-width:560px;margin:0 auto}
+button{font:inherit;cursor:pointer}
+.btn{border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:999px;padding:10px 18px;font-weight:600}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn:disabled{opacity:.35;cursor:default}
+.linkbtn{background:none;border:none;color:var(--muted);text-decoration:underline;padding:4px}
+.hidden{display:none!important}
+
+/* gate */
+.gate{margin:12vh auto 0;max-width:360px;text-align:center}
+.gate input{width:100%;font:inherit;font-size:18px;padding:12px 14px;border-radius:var(--radius);border:2px solid var(--tile);background:var(--card);color:var(--ink);margin:14px 0}
+.err{color:#d6455d;min-height:1.4em;font-size:14px}
+
+/* archive */
+.archive{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:14px}
+.pcard{background:var(--card);border:none;border-radius:var(--radius);padding:14px;text-align:left;color:var(--ink);
+  box-shadow:0 1px 0 rgba(0,0,0,.06);position:relative;overflow:hidden;min-height:92px}
+.pcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--rainbow);opacity:.25}
+.pcard.won::before{opacity:1}
+.pcard .num{font-family:Fraunces,serif;font-weight:800;font-size:22px}
+.pcard .t{font-size:13px;color:var(--muted);margin-top:2px}
+.pcard .dots{margin-top:8px;font-size:13px;letter-spacing:1px}
+.stats{color:var(--muted);font-size:14px;margin-top:6px}
+
+/* game */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
+.ptitle{font-family:Fraunces,serif;font-weight:800;font-size:20px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tile{aspect-ratio:1.25/1;border:none;border-radius:10px;background:var(--tile);color:var(--ink);font-weight:700;
+  font-size:clamp(10px,3.2vw,16px);text-transform:uppercase;padding:4px;word-break:break-word;line-height:1.1;
+  transition:transform .12s, background .12s}
+.tile.sel{background:var(--tile-sel);color:var(--tile-sel-ink);transform:scale(.97)}
+.tile.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+.solved{border-radius:10px;padding:14px 8px;text-align:center;color:var(--l-ink);margin-bottom:8px;animation:pop .3s}
+.solved b{display:block;text-transform:uppercase;font-size:15px;letter-spacing:.3px}
+.solved span{font-size:14px;text-transform:uppercase}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:none;opacity:1}}
+.l0{background:var(--l0)}.l1{background:var(--l1)}.l2{background:var(--l2)}.l3{background:var(--l3)}
+.mist{text-align:center;margin:14px 0 4px;color:var(--muted);font-size:14px}
+.mist i{display:inline-block;width:12px;height:12px;border-radius:50%;margin:0 3px;vertical-align:middle}
+.controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.toast{position:fixed;left:50%;top:70px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;z-index:9;pointer-events:none;transition:opacity .2s}
+.endcard{background:var(--card);border-radius:var(--radius);padding:16px;margin-top:16px;text-align:center}
+.endcard h2{font-family:Fraunces,serif;margin:0 0 6px}
+.emoji{font-size:22px;line-height:1.15;margin:8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:10px 0}
+.chip{border:2px solid var(--tile);background:transparent;color:var(--ink);border-radius:999px;padding:6px 12px;font-size:14px}
+.chip.on{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+textarea{width:100%;font:inherit;font-size:14px;border-radius:10px;border:2px solid var(--tile);background:var(--bg);color:var(--ink);padding:8px;min-height:56px}
+.notes{color:var(--muted);font-size:14px;margin-top:8px}
+footer{max-width:560px;margin:28px auto 0;color:var(--muted);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<div class="stripe"></div>
+<header>
+  <div><h1>Rainbow Connections</h1><p class="sub">Four groups of four. For Will &amp; Holly.</p></div>
+  <button id="homeBtn" class="btn hidden" aria-label="Back to archive">Archive</button>
+</header>
+<main>
+  <section id="gate" class="gate">
+    <p>Enter the passphrase.</p>
+    <form id="gateForm"><input id="pw" type="password" autocomplete="current-password" placeholder="passphrase" autofocus>
+    <button class="btn primary" type="submit">Unlock</button></form>
+    <p class="err" id="gateErr"></p>
+  </section>
+
+  <section id="archiveView" class="hidden">
+    <p class="stats" id="stats"></p>
+    <div class="archive" id="archive"></div>
+  </section>
+
+  <section id="gameView" class="hidden">
+    <div class="topbar"><div class="ptitle" id="ptitle"></div><button class="linkbtn" id="resetBtn">Restart</button></div>
+    <div id="solvedRows"></div>
+    <div class="grid" id="grid"></div>
+    <div class="mist" id="mist"></div>
+    <div class="controls" id="controls">
+      <button class="btn" id="shuffleBtn">Shuffle</button>
+      <button class="btn" id="clearBtn">Deselect</button>
+      <button class="btn primary" id="submitBtn" disabled>Submit</button>
+    </div>
+    <div id="end"></div>
+  </section>
+</main>
+<footer id="foot" class="hidden">
+  <button class="linkbtn" id="exportBtn">Copy ratings for Claude</button> ·
+  <button class="linkbtn" id="themeBtn">Light/dark</button> ·
+  <button class="linkbtn" id="lockBtn">Lock</button>
+</footer>
+<div class="toast hidden" id="toast"></div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const MAX_MISTAKES = 4;
+const DOT = ['🟨','🟩','🟦','🟪'];
+const TAGS = ['Fun','Too easy','About right','Too hard','A group felt unfair','Loved the wordplay'];
+let PUZZLES = [], cur = null, sel = [], order = [];
+
+// theme
+const theme = store.get('rc-theme', null);
+if (theme) document.documentElement.dataset.theme = theme;
+$('themeBtn').onclick = () => {
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark'
+    : matchMedia('(prefers-color-scheme: dark)').matches;
+  const t = dark ? 'light' : 'dark';
+  document.documentElement.dataset.theme = t; store.set('rc-theme', t);
+};
+
+// ---------- decryption ----------
+const norm = s => s.trim().toLowerCase().replace(/\s+/g,' ');
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+async function decrypt(pw){
+  const enc = await (await fetch('puzzles.enc.json', {cache:'no-store'})).json();
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(norm(pw)), 'PBKDF2', false, ['deriveKey']);
+  const key = await crypto.subtle.deriveKey({name:'PBKDF2', salt:b64(enc.salt), iterations:enc.iter, hash:'SHA-256'},
+    base, {name:'AES-GCM', length:256}, false, ['decrypt']);
+  const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:b64(enc.iv)}, key, b64(enc.ct));
+  return JSON.parse(new TextDecoder().decode(pt));
+}
+async function unlock(pw, silent){
+  try{
+    PUZZLES = (await decrypt(pw)).sort((a,b)=>a.id-b.id);
+    store.set('rc-pw', norm(pw));
+    $('gate').classList.add('hidden'); $('foot').classList.remove('hidden');
+    route();
+  }catch(e){
+    if (!silent) $('gateErr').textContent = 'That isn’t it. Try again.';
+    store.del('rc-pw');
+  }
+}
+$('gateForm').onsubmit = e => { e.preventDefault(); unlock($('pw').value); };
+$('lockBtn').onclick = () => { store.del('rc-pw'); location.hash=''; location.reload(); };
+
+// ---------- progress ----------
+const prog = () => store.get('rc-progress', {});
+const getP = id => prog()[id] || {solved:[], mistakes:0, guesses:[], status:'new'};
+function saveP(id, p){ const all = prog(); all[id] = p; store.set('rc-progress', all); }
+
+// ---------- routing ----------
+window.addEventListener('hashchange', route);
+function route(){
+  if (!PUZZLES.length) return;
+  const m = location.hash.match(/^#p(\d+)$/);
+  const p = m && PUZZLES.find(x => x.id === +m[1]);
+  if (p) openPuzzle(p); else showArchive();
+}
+$('homeBtn').onclick = () => { location.hash = ''; };
+
+function showArchive(){
+  cur = null;
+  $('gameView').classList.add('hidden'); $('homeBtn').classList.add('hidden');
+  $('archiveView').classList.remove('hidden');
+  const all = prog(); let won = 0, played = 0;
+  $('archive').innerHTML = '';
+  for (const p of PUZZLES){
+    const st = all[p.id] || {status:'new'};
+    if (st.status === 'won') won++;
+    if (st.status === 'won' || st.status === 'lost') played++;
+    const b = document.createElement('button');
+    b.className = 'pcard ' + st.status;
+    const done = st.status === 'won' || st.status === 'lost';
+    b.innerHTML = `<div class="num">#${p.id}</div><div class="t">${done ? esc(p.title||'') : (st.status==='playing' ? 'In progress' : 'Unplayed')}</div>
+      <div class="dots">${done ? (st.status==='won' ? '🌈 ' : '☁️ ') + (st.mistakes||0) + ' mistake' + (st.mistakes===1?'':'s') : ''}</div>`;
+    b.onclick = () => { location.hash = 'p' + p.id; };
+    $('archive').appendChild(b);
+  }
+  $('stats').textContent = `${PUZZLES.length} puzzles · ${played} played · ${won} solved`;
+  window.scrollTo(0,0);
+}
+
+// ---------- game ----------
+function seeded(n){ let s = n * 9301 + 49297; return () => (s = (s * 9301 + 49297) % 233280) / 233280; }
+function shuffle(a, rnd=Math.random){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j = Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function openPuzzle(p){
+  cur = p; sel = [];
+  $('archiveView').classList.add('hidden'); $('gameView').classList.remove('hidden'); $('homeBtn').classList.remove('hidden');
+  const st = getP(p.id);
+  const all = p.groups.flatMap(g => g.words);
+  order = shuffle(all, seeded(p.id));
+  render(); window.scrollTo(0,0);
+}
+function groupOf(w){ return cur.groups.find(g => g.words.includes(w)); }
+function render(){
+  const st = getP(cur.id);
+  const done = st.status === 'won' || st.status === 'lost';
+  $('ptitle').textContent = '#' + cur.id + (done && cur.title ? ' · ' + cur.title : '');
+  const solvedLevels = done ? [...st.solved, ...cur.groups.map(g=>g.level).filter(l => !st.solved.includes(l))] : st.solved;
+  $('solvedRows').innerHTML = solvedLevels.map(l => {
+    const g = cur.groups.find(x => x.level === l);
+    return `<div class="solved l${l}"><b>${esc(g.name)}</b><span>${g.words.map(esc).join(', ')}</span></div>`;
+  }).join('');
+  const remaining = order.filter(w => !solvedLevels.includes(groupOf(w).level));
+  $('grid').innerHTML = '';
+  for (const w of remaining){
+    const t = document.createElement('button');
+    t.className = 'tile' + (sel.includes(w) ? ' sel' : ''); t.textContent = w; t.dataset.w = w;
+    t.onclick = () => toggle(w);
+    $('grid').appendChild(t);
+  }
+  const left = MAX_MISTAKES - st.mistakes;
+  $('mist').innerHTML = done ? '' : 'Mistakes remaining: ' + Array.from({length:MAX_MISTAKES}, (_,i) =>
+    `<i style="background:${i < left ? ['#ff5f6d','#ffd84d','#4fb3ff','#8a7bff'][i] : 'var(--tile)'}"></i>`).join('');
+  $('controls').classList.toggle('hidden', done);
+  $('submitBtn').disabled = sel.length !== 4;
+  $('end').innerHTML = done ? endCard(st) : '';
+  if (done) wireEnd();
+}
+function toggle(w){
+  if (sel.includes(w)) sel = sel.filter(x => x !== w);
+  else if (sel.length < 4) sel.push(w);
+  render();
+}
+$('shuffleBtn').onclick = () => { const st = getP(cur.id); order = shuffle(order); render(); };
+$('clearBtn').onclick = () => { sel = []; render(); };
+$('resetBtn').onclick = () => {
+  if (!confirm('Restart this puzzle? Your progress on it will be cleared.')) return;
+  const all = prog(); delete all[cur.id]; store.set('rc-progress', all); sel = []; render();
+};
+$('submitBtn').onclick = () => {
+  if (sel.length !== 4) return;
+  const st = getP(cur.id);
+  const key = sel.slice().sort().join('|');
+  if (st.guesses.some(g => g.slice().sort().join('|') === key)){ toast('Already guessed!'); return; }
+  st.guesses.push(sel.slice()); st.status = 'playing';
+  const g = groupOf(sel[0]);
+  if (sel.every(w => groupOf(w) === g)){
+    st.solved.push(g.level); sel = [];
+    if (st.solved.length === 4){ st.status = 'won'; setTimeout(() => toast(['Perfect!','Splendid!','Great!','Phew!'][Math.min(st.mistakes,3)]), 300); }
+    saveP(cur.id, st); render();
+  } else {
+    const counts = {}; sel.forEach(w => { const l = groupOf(w).level; counts[l] = (counts[l]||0)+1; });
+    const oneAway = Object.values(counts).includes(3);
+    st.mistakes++;
+    if (st.mistakes >= MAX_MISTAKES) st.status = 'lost';
+    saveP(cur.id, st);
+    document.querySelectorAll('.tile.sel').forEach(t => { t.classList.add('shake'); });
+    toast(st.status === 'lost' ? 'Next time!' : (oneAway ? 'One away…' : 'Not quite'));
+    setTimeout(() => { if (st.status === 'lost') sel = []; render(); }, 400);
+  }
+};
+function emojiGrid(st){
+  return st.guesses.map(g => g.map(w => DOT[groupOf(w).level]).join('')).join('\n');
+}
+function endCard(st){
+  const r = store.get('rc-ratings', {})[cur.id] || {tags:[], comment:''};
+  return `<div class="endcard">
+    <h2>${st.status === 'won' ? '🌈 Solved' : '☁️ Out of guesses'}</h2>
+    <div class="emoji">${emojiGrid(st).replace(/\n/g,'<br>')}</div>
+    ${cur.notes ? `<p class="notes">${esc(cur.notes)}</p>` : ''}
+    <p style="margin:14px 0 0;font-weight:600">How was it?</p>
+    <div class="chips">${TAGS.map(t => `<button class="chip${r.tags.includes(t)?' on':''}" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+    <textarea id="comment" placeholder="Anything else? (which group, what was unfair…)">${esc(r.comment||'')}</textarea>
+    <div class="controls">
+      <button class="btn" id="copyRes">Copy result</button>
+      <button class="btn primary" id="nextBtn">Next puzzle</button>
+    </div>
+  </div>`;
+}
+function saveRating(mut){
+  const all = store.get('rc-ratings', {}); const r = all[cur.id] || {tags:[], comment:''};
+  mut(r); r.ts = new Date().toISOString(); all[cur.id] = r; store.set('rc-ratings', all);
+}
+function wireEnd(){
+  document.querySelectorAll('.chip').forEach(c => c.onclick = () => {
+    const t = c.dataset.tag;
+    saveRating(r => { r.tags = r.tags.includes(t) ? r.tags.filter(x=>x!==t) : [...r.tags, t]; });
+    c.classList.toggle('on');
+  });
+  $('comment').oninput = e => saveRating(r => { r.comment = e.target.value; });
+  $('copyRes').onclick = () => copy(`Rainbow Connections #${cur.id}\n` + emojiGrid(getP(cur.id)));
+  $('nextBtn').onclick = () => {
+    const all = prog();
+    const nxt = PUZZLES.find(p => p.id > cur.id && !['won','lost'].includes((all[p.id]||{}).status))
+             || PUZZLES.find(p => !['won','lost'].includes((all[p.id]||{}).status));
+    location.hash = nxt ? 'p' + nxt.id : '';
+  };
+}
+$('exportBtn').onclick = () => {
+  const ratings = store.get('rc-ratings', {}), all = prog();
+  const out = Object.keys({...ratings, ...all}).sort((a,b)=>a-b).map(id => ({
+    id:+id, status:(all[id]||{}).status, mistakes:(all[id]||{}).mistakes, ...(ratings[id]||{})
+  }));
+  copy('Rainbow Connections feedback:\n' + JSON.stringify(out, null, 1));
+};
+async function copy(text){
+  try{ await navigator.clipboard.writeText(text); toast('Copied'); }
+  catch(e){ prompt('Copy this:', text); }
+}
+let tt;
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.remove('hidden'); t.style.opacity = 1;
+  clearTimeout(tt); tt = setTimeout(() => { t.style.opacity = 0; setTimeout(()=>t.classList.add('hidden'),200); }, 1400); }
+
+// boot
+const saved = store.get('rc-pw', null);
+if (saved) unlock(saved, true);
+})();
+</script>
+</body>
+</html>
