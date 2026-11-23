@@ -592,10 +592,9 @@ function render(){
     return `<div class="solved l${l}${l === justSolved ? ' new' : ''}" data-l="${l}"><b>${esc(g.name)}</b><span>${g.words.map(esc).join(', ')}</span></div>`;
   }).join('');
   const remaining = order.filter(w => !solvedLevels.includes(groupOf(w).level));
-  const hinted = {}; (st.hints||[]).forEach(l => { hinted[hintWord(cur.groups.find(x => x.level === l))] = l; });
-  const hintsLeft = cur.groups.filter(g => !st.solved.includes(g.level) && !(st.hints||[]).includes(g.level)).length;
-  $('hintBtn').disabled = !hintsLeft; $('hintBtn').classList.toggle('hidden', done);
-  $('hintBtn').textContent = (st.hints||[]).length ? `💡 Hint (${(st.hints||[]).length}/4)` : '💡 Hint';
+  const hinted = {}; hintWords(st).forEach(w => { hinted[w] = groupOf(w).level; });
+  $('hintBtn').disabled = !nextHint(st); $('hintBtn').classList.toggle('hidden', done);
+  $('hintBtn').textContent = (st.hints||[]).length ? `💡 Hint (${(st.hints||[]).length})` : '💡 Hint';
   $('grid').innerHTML = '';
   remaining.forEach((w, i) => {
     const t = document.createElement('button');
@@ -625,14 +624,23 @@ function render(){
   }
 }
 function hintWord(g){ const h = cur.hints && cur.hints[g.level]; return h && g.words.includes(h) ? h : g.words[0]; }
+// Hint entries are words; old saves stored a level number, meaning that group's anchor word.
+function hintWords(st){ return (st.hints||[]).map(h => typeof h === 'number' ? hintWord(cur.groups.find(x => x.level === h)) : h); }
+function hintOrder(g){ const a = hintWord(g); return [a, ...g.words.filter(w => w !== a)]; }
+// Round robin: first the anchor of each unsolved group (easiest first), then a second word of each, up to all four.
+function nextHint(st){
+  const have = new Set(hintWords(st)), gs = cur.groups.slice().sort((a, b) => a.level - b.level).filter(g => !st.solved.includes(g.level));
+  for (let k = 0; k < 4; k++) for (const g of gs){ const w = hintOrder(g)[k]; if (!have.has(w)) return w; }
+  return null;
+}
 $('hintBtn').onclick = () => {
   if (busy) return;
   const st = getP(cur.id); st.hints = st.hints || [];
-  const next = cur.groups.slice().sort((a, b) => a.level - b.level).find(g => !st.solved.includes(g.level) && !st.hints.includes(g.level));
-  if (!next) return;
-  if (!st.hints.length && !confirm('Reveal one word from a category, marked with its colour? Each press reveals one more category (easiest first). Using hints rules out the Perfect and rainbow awards.')) return;
-  st.hints.push(next.level); st.status = 'playing'; saveP(cur.id, st); render();
-  const t = [...document.querySelectorAll('.tile')].find(x => x.dataset.w === hintWord(next)); if (t) FX.burstAt(t, LV[next.level]);
+  const w = nextHint(st);
+  if (!w) return;
+  if (!st.hints.length && !confirm('Reveal a word, marked with its category colour? The first four presses give one word from each category (easiest first); keep pressing for more, up to the whole category. Using hints rules out the Perfect and rainbow awards.')) return;
+  st.hints.push(w); st.status = 'playing'; saveP(cur.id, st); render();
+  const t = [...document.querySelectorAll('.tile')].find(x => x.dataset.w === w); if (t) FX.burstAt(t, LV[groupOf(w).level]);
 };
 function toggle(w){
   if (busy) return;
