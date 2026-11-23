@@ -638,7 +638,6 @@ $('hintBtn').onclick = () => {
   const st = getP(cur.id); st.hints = st.hints || [];
   const w = nextHint(st);
   if (!w) return;
-  if (!st.hints.length && !confirm('Reveal a word, marked with its category colour? The first four presses give one word from each category (easiest first); keep pressing for more, up to the whole category. Using hints rules out the Perfect and rainbow awards.')) return;
   st.hints.push(w); st.status = 'playing'; saveP(cur.id, st); render();
   const t = [...document.querySelectorAll('.tile')].find(x => x.dataset.w === w); if (t) FX.burstAt(t, LV[groupOf(w).level]);
 };
