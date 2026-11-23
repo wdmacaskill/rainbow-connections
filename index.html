@@ -571,6 +571,15 @@ function showArchive(){
 
 // ---------- game ----------
 function seeded(n){ let s = n * 9301 + 49297; return () => (s = (s * 9301 + 49297) % 233280) / 233280; }
+// Opening grid, NYT-style: an authored `start` order if the puzzle has one; otherwise a seeded deal
+// where every row holds one word from each group, so no row hands you a pair.
+function dealOrder(p){
+  const all = p.groups.flatMap(g => g.words);
+  if (Array.isArray(p.start) && p.start.length === 16 && all.every(w => p.start.includes(w))) return p.start.slice();
+  const rnd = seeded(p.id), rows = [[],[],[],[]];
+  shuffle(p.groups, rnd).forEach(g => shuffle(g.words, rnd).forEach((w, r) => rows[r].push(w)));
+  return shuffle(rows, rnd).flatMap(r => shuffle(r, rnd));
+}
 function shuffle(a, rnd=Math.random){ a = a.slice(); for (let i=a.length-1;i>0;i--){ const j = Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -578,7 +587,7 @@ function openPuzzle(p){
   cur = p; active = 0; busy = false; justSolved = null; dealt = false;
   marks = store.get('rc-marks', {})[p.id] || {}; syncSel();
   $('archiveView').classList.add('hidden'); $('gameView').classList.remove('hidden'); $('homeBtn').classList.remove('hidden');
-  order = shuffle(p.groups.flatMap(g => g.words), seeded(p.id));
+  order = dealOrder(p);
   render(); window.scrollTo(0,0);
 }
 function groupOf(w){ return cur.groups.find(g => g.words.includes(w)); }
