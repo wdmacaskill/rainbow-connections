@@ -506,7 +506,8 @@ $('homeBtn').onclick = () => { location.hash = ''; };
 
 const today = () => new Date().toLocaleDateString('en-CA');
 const dayAdd = (s, n) => { const d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return d.toLocaleDateString('en-CA'); };
-const unlocked = p => !p.date || p.date <= today();
+// retired puzzles stay visible only on a device that has started or finished them
+const unlocked = p => (!p.date || p.date <= today()) && !(p.retired && (prog()[p.id] || {status:'new'}).status === 'new');
 function streaks(all){
   const days = new Set(Object.values(all).filter(s => s.status === 'won' && s.finishedAt).map(s => s.finishedAt));
   let cur = 0, d = days.has(today()) ? today() : dayAdd(today(), -1);
